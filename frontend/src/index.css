@@ -2,37 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Fond premium sombre + léger dégradé */
-body {
-  @apply bg-gradient-to-br from-base-900 to-base-800 text-slate-100;
+/* --- Palette luxe (clair) --- */
+:root{
+  --gold: #d4af37;
+  --gold-600:#b8942b;
+  --ivory:#fffaf3;
+  --sand:#f7efe3;
+  --ring: var(--gold);
 }
 
-/* Container mobile-first avec respect des encoches */
-.app-container {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 72px); /* espace pour nav bas */
+/* Fond crème premium + halo léger */
+body{
+  background:
+    radial-gradient(900px 600px at 20% -10%, var(--ivory), transparent 60%),
+    linear-gradient(180deg, var(--sand), #ffffff 60%);
+  color: #0f172a; /* slate-900 */
+}
+
+/* Container mobile : garde de la place pour le dock */
+.app-container{
+  padding-bottom: calc(env(safe-area-inset-bottom) + 96px);
   @apply max-w-3xl mx-auto p-4 sm:p-6;
 }
 
-/* Cartes élégantes */
-.card {
-  @apply bg-white/90 text-slate-900 rounded-3xl shadow-xl ring-1 ring-brand-500/15 p-4 sm:p-6 backdrop-blur;
+/* Cartes “verre” */
+.card{
+  @apply bg-white/90 rounded-3xl shadow-xl p-4 sm:p-6;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.06),
+    0 1px 0 rgba(255,255,255,.6) inset;
+  border: 1px solid rgba(212,175,55,.14); /* or fin */
+  backdrop-filter: blur(8px);
 }
 
 /* Boutons */
-.btn {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-2xl font-semibold transition select-none;
+.btn{ @apply inline-flex items-center justify-center px-4 py-2 rounded-2xl font-semibold transition select-none; }
+.btn-primary{
+  background: linear-gradient(180deg, #e7d48d, var(--gold));
+  color: #1f2937;
+  box-shadow: 0 6px 16px rgba(212,175,55,.25);
 }
-.btn-primary {
-  @apply bg-brand-500 hover:bg-brand-600 text-white shadow-md;
-}
-.btn-ghost {
-  @apply bg-white/70 hover:bg-white text-slate-900 shadow;
+.btn-primary:hover{ filter: brightness(.97); }
+.btn.bg-white{ @apply bg-white/90; backdrop-filter: blur(6px); }
+
+/* Badges douceur or */
+.badge{
+  @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm;
+  background: #fff7e0;
+  color: var(--gold-600);
 }
 
-/* Badges */
-.badge {
-  @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-brand-50 text-brand-600;
+/* Progrès barres (dégradé or) */
+[style*="linear-gradient(90deg,#f97316"]{
+  background: linear-gradient(90deg, #e7d48d, var(--gold)) !important;
 }
-
-/* Anneau coloré par défaut */
-:root { --ring: #d4af37; }

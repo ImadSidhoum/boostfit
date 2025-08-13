@@ -20,7 +20,7 @@ export default function LevelBadge(){
       </div>
       <div className="w-40">
         <div className="w-full bg-slate-100 rounded-full h-2">
-          <div className="h-2 rounded-full" style={{width: `${pct}%`, background: 'linear-gradient(90deg,#f97316,#fb923c)'}}/>
+          <div className="h-2 rounded-full" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#e7d48d,#d4af37)" }}/>
         </div>
         <div className="text-right text-xs text-slate-500 mt-1">{pct}%</div>
       </div>

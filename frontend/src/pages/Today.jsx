@@ -16,6 +16,8 @@ export default function Today() {
 
   const doneCount = useMemo(() => habits.filter(h => h.done).length, [habits]);
   const totalHabits = useMemo(() => habits.length, [habits]);
+  const countLabel = totalHabits === 1 ? "1 action du jour" : `${totalHabits} actions du jour`;
+
 
   const fetchPlan = async () => {
     setLoading(true)
@@ -40,21 +42,17 @@ export default function Today() {
   }, []);
 
   const toggleHabit = async (h) => {
-    const newDone = !h.done;
-    const optimistic = habits.map(x => x.id === h.id ? { ...x, done: newDone } : x);
-    setHabits(optimistic);
-
-    try {
-      await api.post("/checkins", { habit_id: h.id, done: newDone });
-      const nowDone = optimistic.filter(x => x.done).length;
-      if (nowDone === totalHabits && totalHabits > 0) { // Corrected logic
-        setCelebrate(true);
-        setTimeout(() => setCelebrate(false), 1800);
-      }
-    } catch (e) {
-      console.error(e);
-      setHabits(habits); // revert
+  const newDone = !h.done;
+  const optimistic = habits.map(x => x.id === h.id ? { ...x, done: newDone } : x);
+  setHabits(optimistic);
+  try {
+    await api.post("/checkins", { habit_id: h.id, done: newDone });
+    if (navigator.vibrate) navigator.vibrate(12); // ✨
+    const nowDone = optimistic.filter(x => x.done).length;
+    if (nowDone === totalHabits && totalHabits > 0) {
+      setCelebrate(true); setTimeout(() => setCelebrate(false), 1800);
     }
+  } catch (e) { console.error(e); setHabits(habits); }
   };
 
   if (loading) {
@@ -68,10 +66,12 @@ export default function Today() {
       <div className="card flex items-center justify-between">
         <div>
           <div className="badge">Énergie: {energy}</div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold mt-2">Tes 3 actions du jour</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-serif mt-2">
+            Tes {countLabel}
+          </h1>
           <p className="text-slate-600 mt-1">{planMsg}</p>
         </div>
-        <ProgressRing total={3} done={doneCount}/>
+        <ProgressRing total={Math.max(1, totalHabits)} done={doneCount}/>
       </div>
 
       {/* 🌱 Jardin de progrès (visuel) */}

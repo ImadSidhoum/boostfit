@@ -96,7 +96,7 @@ function DropSlot({ slot, onDropHabit, children }){
     <div
       onDragOver={(e)=>e.preventDefault()}
       onDrop={onDrop}
-      className="rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50/40 p-3 min-h-[96px] border border-orange-100"
+      className="rounded-2xl p-3 min-h-[96px] border border-[#f1e7c8] bg-gradient-to-br from-[#fff9ea] to-[#fff] ring-1 ring-white/30"
     >
       <div className="text-sm font-semibold mb-2">{slot.label}</div>
       <div className="space-y-2">{children}</div>
