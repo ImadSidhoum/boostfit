@@ -40,7 +40,7 @@ body {
   }
   .btn-primary {
     @apply bg-brand-charcoal-dark text-white;
-    @apply hover:bg-brand-charcoal-DEFAULT;
+    @apply hover:bg-brand-charcoal; /* CORRECTED LINE */
     @apply active:scale-95;
     box-shadow: 0 4px 16px rgba(29, 25, 16, 0.1);
   }
