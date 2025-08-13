@@ -2,26 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --ring: #F97316;
+/* Fond premium sombre + léger dégradé */
+body {
+  @apply bg-gradient-to-br from-base-900 to-base-800 text-slate-100;
 }
 
+/* Container mobile-first avec respect des encoches */
 .app-container {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 72px); /* espace pour nav bas */
   @apply max-w-3xl mx-auto p-4 sm:p-6;
 }
 
+/* Cartes élégantes */
 .card {
-  @apply bg-white rounded-2xl shadow-md p-4 sm:p-6;
+  @apply bg-white/90 text-slate-900 rounded-3xl shadow-xl ring-1 ring-brand-500/15 p-4 sm:p-6 backdrop-blur;
 }
 
+/* Boutons */
 .btn {
-  @apply inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold transition;
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-2xl font-semibold transition select-none;
 }
-
 .btn-primary {
-  @apply bg-brand-600 hover:bg-brand-500 text-white;
+  @apply bg-brand-500 hover:bg-brand-600 text-white shadow-md;
+}
+.btn-ghost {
+  @apply bg-white/70 hover:bg-white text-slate-900 shadow;
 }
 
+/* Badges */
 .badge {
-  @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-700;
+  @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-brand-50 text-brand-600;
 }
+
+/* Anneau coloré par défaut */
+:root { --ring: #d4af37; }
