@@ -1,7 +1,7 @@
 // src/main.jsx
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom'
 import App from './App.jsx'
 import Today from './pages/Today.jsx'
 import Progress from './pages/Progress.jsx'
@@ -11,78 +11,55 @@ import './index.css'
 import AuthGate from './AuthGate.jsx'
 import { supabase } from './lib/supabase'
 import Auth from './pages/Auth.jsx'
-import InstallPWAButton from './components/InstallPWAButton.jsx'
+import { motion } from "framer-motion"
+import { IconHome, IconChartBar, IconSparkles, IconUser, IconArrowRightOnRectangle } from './components/Icons'
+
+function NavItem({ to, icon: Icon, label }) {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+
+    return (
+        <NavLink to={to} className="nav-item flex-1 flex flex-col items-center justify-center gap-1 py-2 relative transition-colors">
+            <Icon className={`w-6 h-6 transition-colors ${isActive ? 'text-brand-charcoal-dark' : 'text-brand-charcoal-light'}`} />
+            <span className={`text-xs font-medium transition-colors ${isActive ? 'text-brand-charcoal-dark' : 'text-brand-charcoal-light'}`}>
+                {label}
+            </span>
+            {isActive && (
+                <motion.div
+                    className="absolute bottom-1 w-2 h-2 rounded-full bg-brand-gold"
+                    layoutId="active-nav-indicator"
+                />
+            )}
+        </NavLink>
+    );
+}
 
 function Shell() {
-  const signOut = async ()=> { try { await supabase.auth.signOut() } catch {} }
-
-  const LinkBtn = ({to, children}) => (
-    <NavLink
-      to={to}
-      className={({isActive}) =>
-        `relative item flex-1 flex flex-col items-center justify-center gap-0.5 py-3
-         ${isActive ? 'text-[var(--gold)]' : 'text-slate-500'}`
-      }
-    >
-      {({isActive}) => (
-        <>
-          {children}
-          {isActive && <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-8 h-1 rounded-full" style={{background:'linear-gradient(90deg,#e7d48d,#d4af37)'}}/>}
-        </>
-      )}
-    </NavLink>
-  );
+  const signOut = async () => { try { await supabase.auth.signOut() } catch {} }
 
   return (
     <BrowserRouter>
       <div className="app-container">
         <AuthGate>
-          {/* Top brand (desktop only) */}
-          <div className="hidden sm:flex items-center justify-between mb-6">
-            <div className="font-serif text-3xl font-extrabold tracking-tight">
-              Boost<span className="text-brand-500">Fit</span>
-            </div>
-            <div className="flex gap-2 items-center">
-              {/* Desktop install button */}
-              <InstallPWAButton className="btn bg-white shadow" label="Installer l’app" />
-              <NavLink to="/"           className={({isActive}) => `btn ${isActive ? 'btn-primary' : 'btn-ghost'}`}>Aujourd’hui</NavLink>
-              <NavLink to="/progress"   className={({isActive}) => `btn ${isActive ? 'btn-primary' : 'btn-ghost'}`}>Suivi</NavLink>
-              <NavLink to="/coach"      className={({isActive}) => `btn ${isActive ? 'btn-primary' : 'btn-ghost'}`}>Coach</NavLink>
-              <NavLink to="/onboarding" className={({isActive}) => `btn ${isActive ? 'btn-primary' : 'btn-ghost'}`}>Profil</NavLink>
-              <button className="btn btn-ghost" onClick={signOut} title="Se déconnecter">Quitter</button>
-            </div>
-          </div>
-
-          {/* Routes */}
           <Routes>
-            <Route path="/" element={<Today/>}/>
-            <Route path="/progress" element={<Progress/>}/>
-            <Route path="/coach" element={<Coach/>}/>
-            <Route path="/onboarding" element={<Onboarding/>}/>
-            <Route path="/auth" element={<Auth/>}/>
-            <Route path="*" element={<App/>}/>
+            <Route path="/" element={<Today />} />
+            <Route path="/progress" element={<Progress />} />
+            <Route path="/coach" element={<Coach />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="*" element={<App />} />
           </Routes>
-
-          {/* Bottom dock (mobile) */}
+          
           <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 mobile-dock">
-            <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl ring-1 ring-[rgba(212,175,55,.14)] flex items-center justify-between">
-              <div className="bg-white/90 backdrop-blur rounded-3xl shadow-2xl ring-1 ring-brand-500/15 flex items-center justify-between w-full">
-                <LinkBtn to="/">🏠<div className="text-xs">Aujourd’hui</div></LinkBtn>
-                <LinkBtn to="/progress">📈<div className="text-xs">Suivi</div></LinkBtn>
-                <LinkBtn to="/coach">🎯<div className="text-xs">Coach</div></LinkBtn>
-                <LinkBtn to="/onboarding">⚙️<div className="text-xs">Profil</div></LinkBtn>
-
-                {/* Mobile install button — works on Android (native prompt) and iOS (shows tip) */}
-                <InstallPWAButton
-                    className="item flex-1 flex flex-col items-center justify-center py-3 text-slate-500 sm:hidden"
-                    label="Installer"
-                  />
-
-                <button onClick={signOut} className="item flex-1 flex flex-col items-center justify-center py-3 text-slate-500">
-
-                  ⏏︎<div className="text-xs">Quitter</div>
+            <div className="mobile-dock-inner flex items-center justify-around">
+                <NavItem to="/" icon={IconHome} label="Aujourd'hui" />
+                <NavItem to="/progress" icon={IconChartBar} label="Suivi" />
+                <NavItem to="/coach" icon={IconSparkles} label="Coach" />
+                <NavItem to="/onboarding" icon={IconUser} label="Profil" />
+                <button onClick={signOut} className="nav-item flex-1 flex flex-col items-center justify-center gap-1 py-2 text-brand-charcoal-light">
+                    <IconArrowRightOnRectangle className="w-6 h-6" />
+                    <span className="text-xs font-medium">Quitter</span>
                 </button>
-              </div>
             </div>
           </nav>
         </AuthGate>
@@ -93,6 +70,6 @@ function Shell() {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Shell/>
+    <Shell />
   </React.StrictMode>,
 )

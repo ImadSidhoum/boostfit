@@ -2,74 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root { height: 100%; }
-body { min-height: 100svh; }
-
-/* --- Palette luxe (clair) --- */
-:root{
-  --gold: #d4af37;
-  --gold-600:#b8942b;
-  --ivory:#fffaf3;
-  --sand:#f7efe3;
-  --ring: var(--gold);
-}
-
-/* Fond crème premium + halo léger */
-body{
-  background:
-    radial-gradient(900px 600px at 20% -10%, var(--ivory), transparent 60%),
-    linear-gradient(180deg, var(--sand), #ffffff 60%);
-  color: #0f172a; /* slate-900 */
-}
-
-/* Container mobile : garde de la place pour le dock */
-:root{
+/* Set up safe area variables for PWA on iOS */
+:root {
   --sat: env(safe-area-inset-top);
   --sab: env(safe-area-inset-bottom);
 }
 
-/* Already present; extend it with top padding */
-.app-container{
-  padding-top: calc(env(safe-area-inset-top) + 12px);
-  padding-bottom: calc(env(safe-area-inset-bottom) + 96px);
+/* Apply a more subtle and premium background gradient */
+body {
+  background: linear-gradient(170deg, theme('colors.brand.sand.light') 0%, #FFFFFF 70%);
+  color: theme('colors.brand.charcoal.dark');
+  min-height: 100svh;
 }
 
-/* Cartes “verre” */
-.card{
-  @apply bg-white/90 rounded-3xl shadow-xl p-4 sm:p-6;
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.06),
-    0 1px 0 rgba(255,255,255,.6) inset;
-  border: 1px solid rgba(212,175,55,.14); /* or fin */
-  backdrop-filter: blur(8px);
+/* Main container with padding for safe areas and mobile dock */
+.app-container {
+  padding: calc(var(--sat) + 1rem) 1rem calc(var(--sab) + 6rem);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-/* Boutons */
-.btn{ @apply inline-flex items-center justify-center px-4 py-2 rounded-2xl font-semibold transition select-none; }
-.btn-primary{
-  background: linear-gradient(180deg, #e7d48d, var(--gold));
-  color: #1f2937;
-  box-shadow: 0 6px 16px rgba(212,175,55,.25);
-}
-.btn-primary:hover{ filter: brightness(.97); }
-.btn.bg-white{ @apply bg-white/90; backdrop-filter: blur(6px); }
-
-/* Badges douceur or */
-.badge{
-  @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm;
-  background: #fff7e0;
-  color: var(--gold-600);
+/* Glassmorphism Card Style */
+.card {
+  @apply bg-white/80 rounded-3xl shadow-soft-lg p-4 sm:p-6;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Safari support */
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.7) inset, theme('boxShadow.soft-lg');
 }
 
-/* Progrès barres (dégradé or) */
-[style*="linear-gradient(90deg,#f97316"]{
-  background: linear-gradient(90deg, #e7d48d, var(--gold)) !important;
+/* --- Component Base Styles --- */
+@layer components {
+  /* Button Styles */
+  .btn {
+    @apply inline-flex items-center justify-center select-none px-5 py-3 rounded-2xl font-semibold transition-all duration-200 ease-in-out;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-gold;
+  }
+  .btn-primary {
+    @apply bg-brand-charcoal-dark text-white;
+    @apply hover:bg-brand-charcoal-DEFAULT;
+    @apply active:scale-95;
+    box-shadow: 0 4px 16px rgba(29, 25, 16, 0.1);
+  }
+  .btn-secondary {
+    @apply bg-brand-gold text-brand-charcoal-dark;
+    @apply hover:brightness-105;
+    @apply active:scale-95;
+  }
+  .btn-ghost {
+    @apply bg-transparent text-brand-charcoal-light hover:bg-brand-sand active:bg-brand-sand/80;
+  }
+  .btn-subtle {
+    @apply bg-white/80 backdrop-blur-sm border border-slate-200/80 text-brand-charcoal-light hover:bg-white;
+    @apply active:scale-95 shadow-soft;
+  }
+
+  /* Form Input Styles */
+  .form-input {
+    @apply w-full mt-1 border border-slate-200/80 rounded-xl px-4 py-3 bg-white/50;
+    @apply focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-brand-gold;
+    transition: all 150ms ease-in-out;
+  }
+
+  /* Badge Styles */
+  .badge {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium;
+    @apply bg-brand-sand text-brand-gold-dark;
+  }
 }
 
-.mobile-dock{
-  padding: 8px 12px calc(env(safe-area-inset-bottom) + 10px);
+/* --- Mobile Dock --- */
+.mobile-dock {
+  padding: 8px 12px calc(var(--sab) + 10px);
 }
-.mobile-dock .item{
-  min-height: 44px;        /* cible tactile Apple HIG */
-  min-width: 68px;
+.mobile-dock-inner {
+  @apply bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl;
+  border: 1px solid rgba(212, 175, 55, 0.1);
+}
+.mobile-dock .nav-item {
+  min-height: 48px; /* Apple HIG touch target */
+  min-width: 60px;
 }

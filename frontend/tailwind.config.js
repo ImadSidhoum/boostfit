@@ -5,22 +5,37 @@ export default {
     extend: {
       fontFamily: {
         serif: ["Playfair Display", "serif"],
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
       },
       colors: {
         brand: {
-          50:  "#fff8e6",
-          100: "#fdecc3",
-          400: "#e9c976",
-          500: "#d4af37", // GOLD
-          600: "#b8942b"
+          // New Palette
+          gold: {
+            light: '#E7D48D',
+            DEFAULT: '#D4AF37',
+            dark: '#B8942B',
+          },
+          sand: {
+            light: '#FFFBF2',
+            DEFAULT: '#F7EFE3',
+          },
+          charcoal: {
+            light: '#4B5563', // gray-600
+            DEFAULT: '#1F2937', // gray-800
+            dark: '#111827',   // gray-900
+          }
         },
-        base: {
-          900: "#0b0b0c",
-          800: "#121316"
-        }
-      }
+      },
+      boxShadow: {
+        'soft': '0 4px 12px rgba(0, 0, 0, 0.05)',
+        'soft-lg': '0 10px 30px rgba(0, 0, 0, 0.06)',
+      },
+      borderRadius: {
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+      },
     }
   },
-  plugins: []
+  plugins: [],
 }

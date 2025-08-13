@@ -12,9 +12,8 @@
       name="description"
       content="Micro-habitudes, design premium, expérience mobile soignée."
     />
-    <meta name="theme-color" content="#0b0b0c" />
+    <meta name="theme-color" content="#FFFBF2" />
 
-    <!-- iOS PWA (safe, pas de contenu sous la barre d'état) -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="BoostFit" />
@@ -23,18 +22,18 @@
       sizes="180x180"
       href="/apple-touch-icon.png?v=4"
     />
+    <link rel="apple-touch-startup-image" href="/apple-touch-icon.png">
 
-    <!-- (optionnel) Lien manifeste – le plugin PWA l’injecte aussi -->
+
     <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
-  <body class="bg-gradient-to-br from-orange-50 to-amber-50 text-slate-900">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

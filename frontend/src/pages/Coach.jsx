@@ -1,10 +1,13 @@
+// frontend/src/pages/Coach.jsx
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import RecipeCard from "../components/RecipeCard";
 import TargetBar from "../components/TargetBar";
 import CoachChat from "../components/CoachChat";
-import AddRecipeForm from "../components/AddRecipeForm"; // Import the extracted component
-import { enableDailyNudge } from "../utils/notify"; // Import the notification utility
+import AddRecipeForm from "../components/AddRecipeForm";
+import LevelBadge from "../components/LevelBadge";
+import Accordion from "../components/Accordion";
+import Field from "../components/Field";
 
 export default function Coach() {
   const [form, setForm] = useState({
@@ -276,384 +279,155 @@ export default function Coach() {
   }, [form.sex]);
 
   return (
-    <div className="space-y-6">
-      {/* Level / XP badge + water challenge */}
-      <div className="grid sm:grid-cols-2 gap-3">
-        {level && (
-          <div className="card flex items-center justify-between">
-            <div>
-              <div className="text-xs text-slate-500">Niveau</div>
-              <div className="font-bold text-lg">
-                {level.level} — {level.level_name}
-              </div>
-              <div className="text-sm text-slate-600">
-                {level.total_xp} XP (→ {level.next_level_xp} XP)
-              </div>
-            </div>
-            <div className="w-40">
-              <div className="w-full bg-slate-100 rounded-full h-2">
-                <div
-                  className="h-2 rounded-full"
-                  style={{
-                    width: `${Math.round((level.progress_01 || 0) * 100)}%`,
-                    background: "linear-gradient(90deg,#f97316,#fb923c)",
-                  }}
-                />
-              </div>
-              <div className="text-right text-xs text-slate-500 mt-1">
-                {Math.round((level.progress_01 || 0) * 100)}%
-              </div>
-            </div>
-          </div>
-        )}
+    <div className="space-y-5">
+      {level && <LevelBadge />}
 
+      {challenge && (
         <div className="card flex items-center justify-between">
           <div>
             <div className="font-bold">Défi Hydratation 7 jours</div>
-            {challenge ? (
-              <div className="text-slate-600 text-sm">
-                Jour {challenge.day}/{challenge.duration_days} • {challenge.progress_days} jours ≥{" "}
-                {challenge.target_daily} {challenge.unit}
-              </div>
-            ) : (
-              <div className="text-slate-600 text-sm">Bois 1.5–2L/j et coche tes progrès</div>
-            )}
-          </div>
-          {challenge ? (
-            <button className="btn bg-white shadow" onClick={loadChallenge} title="Rafraîchir">
-              ↻
-            </button>
-          ) : (
-            <button className="btn btn-primary" onClick={joinWater7}>
-              Démarrer
-            </button>
-          )}
-        </div>
-      </div>
-
-      <CoachChat />
-
-      {insights && (
-        <div className="card bg-gradient-to-br from-orange-50 to-amber-50/40">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="badge capitalize">Énergie: {insights.energy}</span>
-                <span className="badge">Streak souple: {insights.streak_soft}j</span>
-                {insights.plateau && <span className="badge">Plateau détecté</span>}
-              </div>
-              <p className="mt-2 text-slate-700">{insights.tip}</p>
-            </div>
-            <div className="text-sm text-slate-500">
-              7j done: {(insights.completion_ratio_7d * 100).toFixed(0)}%
+            <div className="text-brand-charcoal-light text-sm">
+              Jour {challenge.day}/{challenge.duration_days} • {challenge.progress_days} jours ≥{" "}
+              {challenge.target_daily} {challenge.unit}
             </div>
           </div>
+          <button className="btn btn-subtle" onClick={loadChallenge} title="Rafraîchir">
+            <IconArrowPath className="w-5 h-5"/>
+          </button>
         </div>
       )}
 
-      <div className="card">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-bold">Estimation personnalisée</h2>
-          <div className="flex gap-2">
-            <button className="btn bg-white shadow" onClick={adjustCalories} type="button">
-              Ajuster calories
-            </button>
-          </div>
+      <CoachChat compact />
+
+      {insights && (
+        <div className="card bg-brand-sand/60">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="badge capitalize">Énergie: {insights.energy}</span>
+                        <span className="badge">Streak souple: {insights.streak_soft}j</span>
+                        {insights.plateau && <span className="badge">Plateau détecté</span>}
+                    </div>
+                    <p className="mt-3 text-brand-charcoal-light">{insights.tip}</p>
+                </div>
+            </div>
         </div>
-        <form className="grid sm:grid-cols-3 gap-3" onSubmit={calc}>
-          <div>
-            <label className="text-sm text-slate-600">Sexe</label>
-            <select
-              className="mt-1 border rounded-xl px-3 py-2 w-full"
-              value={form.sex}
-              onChange={e => onChange("sex", e.target.value)}
-            >
-              <option value="male">Homme</option>
-              <option value="female">Femme</option>
-            </select>
-          </div>
+      )}
+
+      <Accordion title="Estimation Personnalisée">
+        <form className="grid sm:grid-cols-2 gap-4" onSubmit={calc}>
+          <Field
+            label="Sexe" type="select" value={form.sex} onChange={v => onChange("sex", v)}
+            options={[{ value: 'male', label: 'Homme' }, { value: 'female', label: 'Femme' }]}
+          />
           <Field label="Âge" type="number" value={form.age} onChange={v => onChange("age", Number(v))} />
-          <Field
-            label="Taille (cm)"
-            type="number"
-            value={form.height_cm}
-            onChange={v => onChange("height_cm", Number(v))}
-          />
-          <Field
-            label="Poids (kg)"
-            type="number"
-            value={form.weight_kg}
-            onChange={v => onChange("weight_kg", Number(v))}
-          />
-          <Field
-            label="Activité (1.2–1.9)"
-            type="number"
-            step="0.1"
-            value={form.activity_factor}
-            onChange={v => onChange("activity_factor", Number(v))}
-          />
-          <Field
-            label="Déficit (0–0.2)"
-            type="number"
-            step="0.01"
-            value={form.deficit_percent}
-            onChange={v => onChange("deficit_percent", Number(v))}
-          />
-          <div className="sm:col-span-3">
-            <button className="btn btn-primary" type="submit">
-              Calculer
-            </button>
+          <Field label="Taille (cm)" type="number" value={form.height_cm} onChange={v => onChange("height_cm", Number(v))} />
+          <Field label="Poids (kg)" type="number" value={form.weight_kg} onChange={v => onChange("weight_kg", Number(v))} />
+          <Field label="Activité (1.2–1.9)" type="number" step="0.1" value={form.activity_factor} onChange={v => onChange("activity_factor", Number(v))} />
+          <Field label="Déficit (0–0.2)" type="number" step="0.01" value={form.deficit_percent} onChange={v => onChange("deficit_percent", Number(v))} />
+          
+          <div className="sm:col-span-2 flex flex-wrap gap-3">
+            <button className="btn btn-primary" type="submit">Recalculer</button>
+            <button className="btn btn-subtle" onClick={adjustCalories} type="button">Ajustement Auto</button>
           </div>
         </form>
 
         {estimate && (
-          <div className="mt-4 grid sm:grid-cols-3 gap-3">
-            <Stat label="BMR" value={`${estimate.bmr} kcal`} />
-            <Stat label="TDEE" value={`${estimate.tdee} kcal`} />
-            <Stat label="Cible kcal" value={`${estimate.calorie_target} kcal`} />
-            <Stat label="Protéines" value={`${estimate.protein_target_g} g/j`} />
-            <Stat label="Eau" value={`${estimate.water_target_ml} ml/j`} />
-            <Stat label="Fibres" value={`${estimate.fiber_target_g} g/j`} />
-            <div className="sm:col-span-3 text-slate-600 text-sm mt-2">
-              {estimate.notes.map((n, i) => (
-                <div key={i}>• {n}</div>
-              ))}
+          <div className="mt-4 pt-4 border-t border-slate-200/80">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <Stat label="BMR" value={estimate.bmr} unit="kcal" />
+              <Stat label="TDEE" value={estimate.tdee} unit="kcal" />
+              <Stat label="Cible Kcal" value={estimate.calorie_target} unit="kcal" />
+              <Stat label="Protéines" value={`${estimate.protein_target_g}`} unit="g/j" />
+              <Stat label="Eau" value={`${estimate.water_target_ml}`} unit="ml/j" />
+              <Stat label="Fibres" value={`${estimate.fiber_target_g}`} unit="g/j" />
+            </div>
+            <div className="sm:col-span-3 text-brand-charcoal-light text-sm mt-3 space-y-1">
+                {estimate.notes.map((n, i) => <p key={i}>• {n}</p>)}
             </div>
           </div>
         )}
-      </div>
-
-      {estimate && (
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Répartition des macros</h2>
-            <div className="text-sm text-slate-600">Cible: {calorieTarget} kcal</div>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4 mt-3">
-            <div>
-              <label className="text-sm text-slate-600">Part de lipides (% des kcal)</label>
-              <input
-                type="range"
-                min="20"
-                max="40"
-                step="1"
-                className="w-full"
-                value={Math.round(fatPct * 100)}
-                onChange={e => setFatPct(Number(e.target.value) / 100)}
-              />
-              <div className="text-slate-600 text-sm mt-1">{Math.round(fatPct * 100)}%</div>
-            </div>
-            {macros && (
-              <div className="grid grid-cols-3 gap-3">
-                <Stat label="Protéines" value={`${macros.protein_g} g`} />
-                <Stat label="Glucides" value={`${macros.carbs_g} g`} />
-                <Stat label="Lipides" value={`${macros.fat_g} g`} />
-                {macros.notes?.length ? (
-                  <div className="col-span-3 text-sm text-slate-600">{macros.notes[0]}</div>
-                ) : null}
-                <div className="col-span-3">
-                  <button
-                    className="btn bg-white shadow"
-                    onClick={async () => {
-                      const t = `Macros ${calorieTarget} kcal — P${macros.protein_g} / G${macros.carbs_g} / L${macros.fat_g}`;
-                      await navigator.clipboard.writeText(t);
-                      alert("Macros copiées ✅");
-                    }}
-                  >
-                    Copier
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      </Accordion>
 
       {metrics && targets && (
-        <div className="card space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Cibles du jour & journal</h2>
-            <div className="flex gap-2">
-              <button className="btn bg-white shadow" onClick={shareWeekly} type="button">
-                Partager
-              </button>
-              <button
-                className="btn bg-white shadow"
-                onClick={() => loadMetricsTargets(form.sex)}
-                title="Rafraîchir"
-                type="button"
-              >
-                ↻
-              </button>
-              <button className="btn btn-primary" onClick={runWeeklyReview} type="button">
-                Bilan 7 jours
-              </button>
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            <TargetBar
-              label="Pas"
-              unit="pas"
-              value={metrics.steps || 0}
-              target={targets.steps}
-              onChange={v => saveMetrics({ ...metrics, steps: v })}
-            />
-            <TargetBar
-              label="Sommeil"
-              unit="h"
-              value={metrics.sleep_hours || 0}
-              target={targets.sleep_hours}
-              step={0.1}
-              onChange={v => saveMetrics({ ...metrics, sleep_hours: v })}
-            />
-            <TargetBar
-              label="Protéines"
-              unit="g"
-              value={metrics.protein_g || 0}
-              target={targets.protein_g}
-              onChange={v => saveMetrics({ ...metrics, protein_g: v })}
-            />
-            <TargetBar
-              label="Fibres"
-              unit="g"
-              value={metrics.fiber_g || 0}
-              target={targets.fiber_g}
-              onChange={v => saveMetrics({ ...metrics, fiber_g: v })}
-            />
-            <TargetBar
-              label="Hydratation"
-              unit="ml"
-              value={metrics.water_ml || 0}
-              target={targets.water_ml}
-              onChange={v => saveMetrics({ ...metrics, water_ml: v })}
-            />
-            <TargetBar
-              label="Renfo (hebdo)"
-              unit="min"
-              value={metrics.strength_min || 0}
-              target={targets.strength_min_week}
-              onChange={v => saveMetrics({ ...metrics, strength_min: v })}
-            />
-            <TargetBar
-              label="Cardio (hebdo)"
-              unit="min"
-              value={metrics.cardio_min || 0}
-              target={targets.cardio_min_week_min}
-              onChange={v => saveMetrics({ ...metrics, cardio_min: v })}
-            />
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <QuickScale
-              label="Humeur"
-              value={metrics.mood ?? ""}
-              onChange={v => saveMetrics({ ...metrics, mood: v })}
-            />
-            <QuickScale
-              label="Faim"
-              value={metrics.hunger ?? ""}
-              onChange={v => saveMetrics({ ...metrics, hunger: v })}
-            />
-          </div>
-          <div>
-            <label className="text-sm text-slate-600">Notes</label>
-            <textarea
-              className="mt-1 border rounded-xl px-3 py-2 w-full"
-              rows={3}
-              value={metrics.notes ?? ""}
-              onChange={e => saveMetrics({ ...metrics, notes: e.target.value })}
-              placeholder="Non-scale victories, obstacles, idées pour demain…"
-            />
-          </div>
-        </div>
+          <Accordion title="Journal Quotidien" defaultOpen={true}>
+              <div className="flex flex-wrap gap-3 mb-4">
+                  <button className="btn btn-primary" onClick={runWeeklyReview} type="button">Bilan 7 jours</button>
+                  <button className="btn btn-subtle" onClick={shareWeekly} type="button">Partager</button>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                  <TargetBar label="Pas" unit="pas" value={metrics.steps || 0} target={targets.steps} onChange={v => saveMetrics({ ...metrics, steps: v })} />
+                  <TargetBar label="Sommeil" unit="h" value={metrics.sleep_hours || 0} target={targets.sleep_hours} step={0.1} onChange={v => saveMetrics({ ...metrics, sleep_hours: v })} />
+                  <TargetBar label="Protéines" unit="g" value={metrics.protein_g || 0} target={targets.protein_g} onChange={v => saveMetrics({ ...metrics, protein_g: v })} />
+                  <TargetBar label="Hydratation" unit="ml" value={metrics.water_ml || 0} target={targets.water_ml} onChange={v => saveMetrics({ ...metrics, water_ml: v })} />
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4 pt-4 mt-4 border-t border-slate-200/80">
+                  <QuickScale label="Humeur" value={metrics.mood ?? ""} onChange={v => saveMetrics({ ...metrics, mood: v })} />
+                  <QuickScale label="Faim" value={metrics.hunger ?? ""} onChange={v => saveMetrics({ ...metrics, hunger: v })} />
+              </div>
+              <div className="pt-4 mt-4 border-t border-slate-200/80">
+                  <Field label="Notes du jour" type="textarea" value={metrics.notes ?? ""} onChange={v => saveMetrics({ ...metrics, notes: v })} placeholder="Non-scale victories, obstacles, idées..." />
+              </div>
+          </Accordion>
       )}
 
-      <div className="card">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h2 className="text-xl font-bold">Plan repas du jour</h2>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <label className="text-sm text-slate-600 hidden sm:block">Régime</label>
-            <select className="border rounded-xl px-3 py-2 w-[140px] shrink-0"
-              value={diet}
-              onChange={e => setDiet(e.target.value)}
-            >
-              <option value="omnivore">Omnivore</option>
-              <option value="vegetarian">Végétarien</option>
-            </select>
-            <button className="btn bg-white shadow shrink-0" onClick={exportPlan} disabled={!plan}>
-              Exporter
-            </button>
-             <button className="btn btn-primary shrink-0" onClick={loadPlan} disabled={loadingPlan}>
-              {loadingPlan ? "..." : "Générer"}
-            </button>
-          </div>
-        </div>
-
-        {plan && (
-          <div className="space-y-3">
-            <div className="text-slate-600 text-sm">
-              Total ≈ <b>{plan.total_kcal} kcal</b> • <b>{plan.total_protein_g} g</b> de protéines
-              {estimate?.protein_target_g ? (
-                <>
-                  {" "}
-                  (cible: <b>{estimate.protein_target_g} g</b>)
-                </>
-              ) : null}
-            </div>
-            {plan.items.map((it, idx) => (
-              <div key={idx}>
-                <div className="flex items-center justify-between mb-1">
-                  <div className="text-sm uppercase text-slate-500">{it.meal_type}</div>
-                  <button
-                    className="text-sm underline"
-                    onClick={() => swapRecipe(it.meal_type, it.recipe.kcal, idx)}
-                  >
-                    ↻ Remplacer
+      <Accordion title="Plan Repas du Jour">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+              <Field label="Régime" type="select" value={diet} onChange={setDiet} options={[ {value: 'omnivore', label: 'Omnivore'}, {value: 'vegetarian', label: 'Végétarien'} ]} />
+              <div className="flex items-center gap-2">
+                  <button className="btn btn-subtle" onClick={exportPlan} disabled={!plan}>Exporter</button>
+                  <button className="btn btn-primary" onClick={loadPlan} disabled={loadingPlan}>
+                      {loadingPlan ? "..." : "Générer"}
                   </button>
-                </div>
-                <RecipeCard recipe={it.recipe} onAdd={addToPanier} />
               </div>
-            ))}
-            <div className="flex items-center gap-2">
-              <button className="btn btn-primary" onClick={genShopping}>
-                Copier liste de courses
-              </button>
-              <span className="text-slate-600 text-sm">
-                Recettes sélectionnées: {panier.length}
-              </span>
-            </div>
           </div>
-        )}
-        {!plan && (
-          <p className="text-slate-600">
-            Clique sur “Générer” pour proposer un PDJ/Déj/Dîner + 2 snacks adaptés à ta cible.
-          </p>
-        )}
-      </div>
+          {plan && (
+              <div className="space-y-4">
+                  <div className="bg-brand-sand/60 p-3 rounded-xl text-center text-sm">
+                      Total ≈ <b>{plan.total_kcal} kcal</b> • <b>{plan.total_protein_g} g</b> de protéines
+                  </div>
+                  {plan.items.map((it, idx) => (
+                      <div key={idx}>
+                          <div className="flex items-center justify-between mb-1">
+                              <div className="text-sm uppercase font-semibold text-brand-charcoal-light">{it.meal_type}</div>
+                              <button className="text-sm underline" onClick={() => swapRecipe(it.meal_type, it.recipe.kcal, idx)}>
+                                  ↻ Remplacer
+                              </button>
+                          </div>
+                          <RecipeCard recipe={it.recipe} onAdd={addToPanier} />
+                      </div>
+                  ))}
+                  <div className="flex items-center gap-3 pt-3 border-t border-slate-200/80">
+                      <button className="btn btn-secondary" onClick={genShopping}>
+                          Copier Liste Courses ({panier.length})
+                      </button>
+                  </div>
+              </div>
+          )}
+          {!plan && !loadingPlan && (
+              <p className="text-brand-charcoal-light">Cliquez sur “Générer” pour créer un plan repas adapté à votre cible calorique.</p>
+          )}
+      </Accordion>
 
-      <div className="card">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-bold">Snacks rapides</h2>
-          <button className="btn bg-white shadow" onClick={loadSnacks} title="Rafraîchir">
-            ↻
-          </button>
-        </div>
-        {snacks.length === 0 && (
-          <div className="text-slate-600">
-            Aucun snack trouvé — essaye un autre régime ou génère le plan repas.
+      <Accordion title="Idées de Snacks Rapides">
+          <div className="flex justify-end mb-2">
+              <button className="btn btn-subtle" onClick={loadSnacks} title="Rafraîchir">
+                  <IconArrowPath className="w-5 h-5"/>
+              </button>
           </div>
-        )}
-        <div className="grid gap-3">
-          {snacks.map(r => (
-            <RecipeCard key={r.id} recipe={r} onAdd={addToPanier} />
-          ))}
-        </div>
-      </div>
+          {snacks.length === 0 && (
+              <div className="text-brand-charcoal-light">Aucun snack trouvé pour vos critères.</div>
+          )}
+          <div className="grid gap-3">
+              {snacks.map(r => (
+                  <RecipeCard key={r.id} recipe={r} onAdd={addToPanier} />
+              ))}
+          </div>
+      </Accordion>
 
       <AddRecipeForm />
     </div>
   );
-}
 
 function Field({ label, type = "text", value, onChange, step }) {
   return (
@@ -670,11 +444,14 @@ function Field({ label, type = "text", value, onChange, step }) {
   );
 }
 
-function Stat({ label, value }) {
+function Stat({ label, value, unit }) {
   return (
-    <div className="bg-orange-50 rounded-xl p-3">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className="font-semibold text-lg">{value}</div>
+    <div className="bg-brand-sand/50 rounded-2xl p-4 text-center">
+      <div className="text-sm text-brand-charcoal-light">{label}</div>
+      <div className="font-bold text-2xl text-brand-charcoal-dark tracking-tight">
+        {value}
+        {unit && <span className="text-base font-medium ml-1">{unit}</span>}
+      </div>
     </div>
   );
 }

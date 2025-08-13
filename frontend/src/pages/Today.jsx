@@ -6,6 +6,7 @@ import ProgressRing from "../components/ProgressRing";
 import Confetti from "react-confetti";
 import ProgressGarden from "../components/ProgressGarden";
 import ScheduleTimeline from "../components/ScheduleTimeline";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Today() {
   const [habits, setHabits] = useState([]);
@@ -56,35 +57,47 @@ export default function Today() {
   };
 
   if (loading) {
-    return <div className="card">Chargement du plan…</div>;
+    return (
+        <div className="card text-center">
+            <p className="font-semibold">Chargement de votre plan du jour...</p>
+        </div>
+    );
   }
-
 
   return (
     <div className="space-y-5">
-      {celebrate && <Confetti numberOfPieces={200} recycle={false} />}
-      <div className="card flex items-center justify-between">
-        <div>
-          <div className="badge">Énergie: {energy}</div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-serif mt-2">
-            Tes {countLabel}
+      {celebrate && <Confetti width={window.innerWidth} height={window.innerHeight} numberOfPieces={250} recycle={false} />}
+      
+      <div className="card flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex-1">
+          <div className="badge capitalize">Énergie du jour: {energy}</div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold font-serif mt-2 text-brand-charcoal-dark">
+            Aujourd'hui
           </h1>
-          <p className="text-slate-600 mt-1">{planMsg}</p>
+          <p className="text-brand-charcoal-light mt-1">{planMsg}</p>
         </div>
-        <ProgressRing total={Math.max(1, totalHabits)} done={doneCount}/>
+        <ProgressRing total={Math.max(1, totalHabits)} done={doneCount} />
       </div>
 
-      {/* 🌱 Jardin de progrès (visuel) */}
-      <ProgressGarden/>
+      <ProgressGarden />
+      <ScheduleTimeline habits={habits} />
+      
+      <AnimatePresence>
+        {habits.length > 0 ? (
+          <motion.div layout className="grid gap-4">
+            {habits.map((h) => (
+              <HabitCard key={h.id} habit={h} onToggle={() => toggleHabit(h)} />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div layout className="card text-center">
+            <p className="text-2xl mb-2">🎉</p>
+            <h3 className="font-bold text-lg">Tout est prêt !</h3>
+            <p className="text-brand-charcoal-light">Aucune action n'est prévue pour aujourd'hui. Profitez-en pour vous reposer ou ajoutez une nouvelle habitude depuis votre profil.</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* 🗓️ Planification simple (drag & drop + .ics) */}
-      <ScheduleTimeline habits={habits}/>
-
-      <div className="grid gap-4">
-        {habits.map(h => (
-          <HabitCard key={h.id} habit={h} onToggle={()=>toggleHabit(h)}/>
-        ))}
-      </div>
     </div>
-  )
+  );
 }
