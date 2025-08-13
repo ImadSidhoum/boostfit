@@ -18,5 +18,10 @@ COPY . .
 
 EXPOSE 8000
 
-# Use Gunicorn for production
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn",
+     "-w", "4",
+     "-k", "uvicorn.workers.UvicornWorker",
+     "main:app",
+     "--bind", "0.0.0.0:8000",
+     "--access-logfile", "-",
+     "--error-logfile", "-"]
