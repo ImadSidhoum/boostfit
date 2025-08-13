@@ -10,8 +10,27 @@ import './index.css'
 import AuthGate from './AuthGate.jsx'
 import { supabase } from './lib/supabase'
 import Auth from './pages/Auth.jsx'
+import InstallPWAButton from './components/InstallPWAButton.jsx'
+
+import { useEffect, useState } from 'react'
 
 function Shell() {
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+
+  useEffect(() => {
+    const handler = (e) => { e.preventDefault(); setDeferredPrompt(e) }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const InstallBtn = () => !deferredPrompt ? null : (
+    <button
+      className="btn btn-primary"
+      onClick={async () => { deferredPrompt.prompt(); setDeferredPrompt(null) }}
+    >
+      Installer
+    </button>
+  )
   const signOut = async ()=> { try { await supabase.auth.signOut() } catch {} }
 
   const LinkBtn = ({to, children}) => (
@@ -33,6 +52,7 @@ function Shell() {
 
   return (
     <BrowserRouter>
+    <InstallBtn/>
       <div className="app-container">
         <AuthGate>
           {/* Top brand (desktop) */}
@@ -41,6 +61,7 @@ function Shell() {
               Boost<span className="text-brand-500">Fit</span>
             </div>
             <div className="flex gap-2 items-center">
+              <InstallPWAButton className="btn btn-ghost" label="Installer l’app" />
               <NavLink to="/"        className={({isActive}) => `btn ${isActive ? 'btn-primary' : 'btn-ghost'}`}>Aujourd’hui</NavLink>
               <NavLink to="/progress" className={({isActive}) => `btn ${isActive ? 'btn-primary' : 'btn-ghost'}`}>Suivi</NavLink>
               <NavLink to="/coach"    className={({isActive}) => `btn ${isActive ? 'btn-primary' : 'btn-ghost'}`}>Coach</NavLink>

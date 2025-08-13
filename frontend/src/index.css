@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body, #root { height: 100%; }
+body { min-height: 100svh; }
+
 /* --- Palette luxe (clair) --- */
 :root{
   --gold: #d4af37;
