@@ -74,11 +74,12 @@ function Shell() {
 
                 {/* Mobile install button — works on Android (native prompt) and iOS (shows tip) */}
                 <InstallPWAButton
-                  className="item flex-1 flex flex-col items-center justify-center py-3 text-slate-500"
-                  label="Installer"
-                />
+                    className="item flex-1 flex flex-col items-center justify-center py-3 text-slate-500 sm:hidden"
+                    label="Installer"
+                  />
 
                 <button onClick={signOut} className="item flex-1 flex flex-col items-center justify-center py-3 text-slate-500">
+
                   ⏏︎<div className="text-xs">Quitter</div>
                 </button>
               </div>
