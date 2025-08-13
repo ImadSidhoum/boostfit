@@ -56,3 +56,11 @@ body{
 [style*="linear-gradient(90deg,#f97316"]{
   background: linear-gradient(90deg, #e7d48d, var(--gold)) !important;
 }
+
+.mobile-dock{
+  padding: 8px 12px calc(env(safe-area-inset-bottom) + 10px);
+}
+.mobile-dock .item{
+  min-height: 44px;        /* cible tactile Apple HIG */
+  min-width: 68px;
+}

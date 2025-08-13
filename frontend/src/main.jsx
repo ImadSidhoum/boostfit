@@ -15,9 +15,13 @@ function Shell() {
   const signOut = async ()=> { try { await supabase.auth.signOut() } catch {} }
 
   const LinkBtn = ({to, children}) => (
-  <NavLink to={to} className={({isActive}) =>
-    `relative flex-1 text-center py-2 ${isActive ? 'text-[var(--gold)]' : 'text-slate-400'}`
-  }>
+   <NavLink
+     to={to}
+     className={({isActive}) =>
+       `relative item flex-1 flex flex-col items-center justify-center gap-0.5 py-3
+        ${isActive ? 'text-[var(--gold)]' : 'text-slate-500'}`
+     }
+   >
     {({isActive}) => (
       <>
         {children}
@@ -56,14 +60,14 @@ function Shell() {
           </Routes>
 
           {/* Bottom dock (mobile) */}
-          <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
+          <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 mobile-dock">
             <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl ring-1 ring-[rgba(212,175,55,.14)] flex items-center justify-between">
               <div className="bg-white/90 backdrop-blur rounded-3xl shadow-2xl ring-1 ring-brand-500/15 flex items-center justify-between">
                 <LinkBtn to="/">🏠<div className="text-xs">Aujourd’hui</div></LinkBtn>
                 <LinkBtn to="/progress">📈<div className="text-xs">Suivi</div></LinkBtn>
                 <LinkBtn to="/coach">🎯<div className="text-xs">Coach</div></LinkBtn>
                 <LinkBtn to="/onboarding">⚙️<div className="text-xs">Profil</div></LinkBtn>
-                <button onClick={signOut} className="flex-1 text-center py-2 text-slate-400">⏏︎<div className="text-xs">Quitter</div></button>
+                <button onClick={signOut} className="item flex-1 flex flex-col items-center justify-center py-3 text-slate-500">⏏︎<div className="text-xs">Quitter</div></button>
               </div>
             </div>
           </nav>

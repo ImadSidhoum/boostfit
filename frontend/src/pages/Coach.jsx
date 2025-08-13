@@ -569,22 +569,21 @@ export default function Coach() {
       )}
 
       <div className="card">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <h2 className="text-xl font-bold">Plan repas du jour</h2>
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-slate-600">Régime</label>
-            <select
-              className="border rounded-xl px-3 py-2"
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <label className="text-sm text-slate-600 hidden sm:block">Régime</label>
+            <select className="border rounded-xl px-3 py-2 w-[140px] shrink-0"
               value={diet}
               onChange={e => setDiet(e.target.value)}
             >
               <option value="omnivore">Omnivore</option>
               <option value="vegetarian">Végétarien</option>
             </select>
-            <button className="btn bg-white shadow" onClick={exportPlan} disabled={!plan}>
+            <button className="btn bg-white shadow shrink-0" onClick={exportPlan} disabled={!plan}>
               Exporter
             </button>
-            <button className="btn btn-primary" onClick={loadPlan} disabled={loadingPlan}>
+             <button className="btn btn-primary shrink-0" onClick={loadPlan} disabled={loadingPlan}>
               {loadingPlan ? "..." : "Générer"}
             </button>
           </div>
