@@ -1,4 +1,3 @@
-// frontend/src/pages/Coach.jsx
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import RecipeCard from "../components/RecipeCard";
@@ -8,6 +7,8 @@ import AddRecipeForm from "../components/AddRecipeForm";
 import LevelBadge from "../components/LevelBadge";
 import Accordion from "../components/Accordion";
 import Field from "../components/Field";
+import { IconArrowPath } from "../components/Icons";
+import { enableDailyNudge } from "../utils/notify";
 
 export default function Coach() {
   const [form, setForm] = useState({
@@ -50,11 +51,10 @@ export default function Coach() {
     try {
       await api.post("/challenges/join", null, { params: { code: "WATER7" } });
       await loadChallenge();
-      // TODO: Replace with a toast notification for better UX
-      console.log("Défi Hydratation lancé 💧");
+      // Toast: "Défi Hydratation lancé 💧"
     } catch (e) {
-      // TODO: Replace with a toast notification
-      console.error("Impossible de démarrer le défi.");
+      // Toast: "Impossible de démarrer le défi."
+      console.error(e);
     }
   };
 
@@ -108,44 +108,35 @@ export default function Coach() {
     const res = await api.post("/shopping-list", { recipe_ids: panier });
     const lines = res.data.map(i => `• ${i.name}: ${i.qty} ${i.unit}`.trim()).join("\n");
     await navigator.clipboard.writeText(lines);
-    // TODO: Replace with a toast notification
-    alert("Liste de courses copiée dans le presse-papiers ✅");
+    // Toast: "Liste de courses copiée ✅"
   };
 
   const exportPlan = async () => {
     if (!plan) return;
     const lines = [
       `Plan du ${plan.date} — ~${plan.total_kcal} kcal, ${plan.total_protein_g} g prot.`,
-      ...plan.items.map(
-        it =>
-          `• ${it.meal_type.toUpperCase()}: ${it.recipe.name} (${it.recipe.kcal} kcal, ${
-            it.recipe.protein_g
-          } g prot.)`
-      ),
+      ...plan.items.map(it => `• ${it.meal_type.toUpperCase()}: ${it.recipe.name} (${it.recipe.kcal} kcal, ${it.recipe.protein_g} g prot.)`),
     ];
     await navigator.clipboard.writeText(lines.join("\n"));
-    // TODO: Replace with a toast notification
-    alert("Plan repas copié ✅");
+    // Toast: "Plan repas copié ✅"
   };
 
   const swapRecipe = async (meal_type, currentKcal, idx) => {
-    const res = await api.get("/mealplan/alternatives", {
-      params: { meal_type, diet, near_kcal: currentKcal },
-    });
+    const res = await api.get("/mealplan/alternatives", { params: { meal_type, diet, near_kcal: currentKcal } });
     const alt = res.data?.[0];
     if (!alt) {
-        // TODO: Replace with a toast notification
-        return alert("Pas d'alternative trouvée proche en kcal.");
+        // Toast: "Pas d'alternative trouvée."
+        return;
     }
     setPlan(prev => {
-      const items = [...prev.items];
-      items[idx] = { ...items[idx], recipe: alt };
-      return {
-        ...prev,
-        items,
-        total_kcal: items.reduce((s, it) => s + it.recipe.kcal, 0),
-        total_protein_g: items.reduce((s, it) => s + it.recipe.protein_g, 0),
-      };
+        const items = [...prev.items];
+        items[idx] = { ...items[idx], recipe: alt };
+        return {
+            ...prev,
+            items,
+            total_kcal: items.reduce((s, it) => s + it.recipe.kcal, 0),
+            total_protein_g: items.reduce((s, it) => s + it.recipe.protein_g, 0),
+        };
     });
   };
 
@@ -166,9 +157,7 @@ export default function Coach() {
   const runWeeklyReview = async () => {
     const r = await api.get("/review/weekly", { params: { sex: form.sex } });
     setReview(r.data);
-     // TODO: Replace with a toast notification or a modal for better UX
-    alert(
-      [
+    const reviewText = [
         `Bilan ${r.data.start} → ${r.data.end}`,
         `Adhérence:`,
         ...Object.entries(r.data.adherence).map(([k, v]) => `• ${k}: ${(v * 100).toFixed(0)}%`),
@@ -177,10 +166,9 @@ export default function Coach() {
         "",
         "Suggestions:",
         ...r.data.suggestions.map(s => "• " + s),
-      ]
-        .filter(Boolean)
-        .join("\n")
-    );
+    ].filter(Boolean).join("\n");
+    // NOTE: This should be a modal for a better UX.
+    alert(reviewText);
   };
 
   const shareWeekly = async () => {
@@ -193,23 +181,19 @@ export default function Coach() {
         "",
         "Objectif semaine:",
         r.suggestions[0] || "",
-      ]
-        .filter(Boolean)
-        .join("\n");
+      ].filter(Boolean).join("\n");
       if (navigator.share) {
         await navigator.share({ title: "Mon bilan BoostFit", text: lines });
       } else {
         await navigator.clipboard.writeText(lines);
-        // TODO: Replace with a toast notification
-        alert("Résumé copié 👍");
+        // Toast: "Résumé copié 👍"
       }
     } catch (e) {}
   };
 
   const adjustCalories = async () => {
     const r = await api.post("/coach/adjust-calories", null, { params: { sex: form.sex } });
-     // TODO: Replace with a toast notification or modal
-    alert(`${r.data.reason}\nSuggestion: ${r.data.suggestion_kcal_delta} kcal`);
+    // Toast: `${r.data.reason}\nSuggestion: ${r.data.suggestion_kcal_delta} kcal`
   };
 
   const loadLevel = async () => {
@@ -250,13 +234,11 @@ export default function Coach() {
     };
 
     loadInitialData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     calcMacros();
     loadSnacks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [calorieTarget, proteinTarget, fatPct, diet]);
 
   useEffect(() => {
@@ -266,13 +248,10 @@ export default function Coach() {
           api.get("/metrics/today"),
           api.get("/targets", { params: { sex: form.sex } }),
         ]);
-        const M = m.data,
-          T = t.data;
+        const M = m.data, T = t.data;
         const msgs = [];
-        if ((M.protein_g || 0) < 0.7 * T.protein_g)
-          msgs.push("Sous la cible protéines — snack yaourt grec/œufs ?");
-        if ((M.steps || 0) < 0.6 * T.steps)
-          msgs.push("Petite marche de 10 min pour booster les pas ?");
+        if ((M.protein_g || 0) < 0.7 * T.protein_g) msgs.push("Sous la cible protéines — snack yaourt grec/œufs ?");
+        if ((M.steps || 0) < 0.6 * T.steps) msgs.push("Petite marche de 10 min pour booster les pas ?");
         if (msgs.length) new Notification("Coup de pouce BoostFit", { body: msgs.join(" • ") });
       } catch (e) {}
     });
@@ -282,7 +261,7 @@ export default function Coach() {
     <div className="space-y-5">
       {level && <LevelBadge />}
 
-      {challenge && (
+      {challenge ? (
         <div className="card flex items-center justify-between">
           <div>
             <div className="font-bold">Défi Hydratation 7 jours</div>
@@ -291,9 +270,17 @@ export default function Coach() {
               {challenge.target_daily} {challenge.unit}
             </div>
           </div>
-          <button className="btn btn-subtle" onClick={loadChallenge} title="Rafraîchir">
+          <button className="btn btn-subtle !p-2" onClick={loadChallenge} title="Rafraîchir">
             <IconArrowPath className="w-5 h-5"/>
           </button>
+        </div>
+      ) : (
+        <div className="card flex items-center justify-between">
+            <div>
+                <div className="font-bold">Défi Hydratation 7 jours</div>
+                <div className="text-brand-charcoal-light text-sm">Bois 1.5–2L/j et coche tes progrès</div>
+            </div>
+            <button className="btn btn-secondary" onClick={joinWater7}>Démarrer</button>
         </div>
       )}
 
@@ -316,10 +303,7 @@ export default function Coach() {
 
       <Accordion title="Estimation Personnalisée">
         <form className="grid sm:grid-cols-2 gap-4" onSubmit={calc}>
-          <Field
-            label="Sexe" type="select" value={form.sex} onChange={v => onChange("sex", v)}
-            options={[{ value: 'male', label: 'Homme' }, { value: 'female', label: 'Femme' }]}
-          />
+          <Field label="Sexe" type="select" value={form.sex} onChange={v => onChange("sex", v)} options={[{ value: 'male', label: 'Homme' }, { value: 'female', label: 'Femme' }]} />
           <Field label="Âge" type="number" value={form.age} onChange={v => onChange("age", Number(v))} />
           <Field label="Taille (cm)" type="number" value={form.height_cm} onChange={v => onChange("height_cm", Number(v))} />
           <Field label="Poids (kg)" type="number" value={form.weight_kg} onChange={v => onChange("weight_kg", Number(v))} />
@@ -373,7 +357,9 @@ export default function Coach() {
 
       <Accordion title="Plan Repas du Jour">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-              <Field label="Régime" type="select" value={diet} onChange={setDiet} options={[ {value: 'omnivore', label: 'Omnivore'}, {value: 'vegetarian', label: 'Végétarien'} ]} />
+              <div className="flex-1 min-w-[150px]">
+                  <Field label="Régime" type="select" value={diet} onChange={setDiet} options={[ {value: 'omnivore', label: 'Omnivore'}, {value: 'vegetarian', label: 'Végétarien'} ]} />
+              </div>
               <div className="flex items-center gap-2">
                   <button className="btn btn-subtle" onClick={exportPlan} disabled={!plan}>Exporter</button>
                   <button className="btn btn-primary" onClick={loadPlan} disabled={loadingPlan}>
@@ -390,7 +376,7 @@ export default function Coach() {
                       <div key={idx}>
                           <div className="flex items-center justify-between mb-1">
                               <div className="text-sm uppercase font-semibold text-brand-charcoal-light">{it.meal_type}</div>
-                              <button className="text-sm underline" onClick={() => swapRecipe(it.meal_type, it.recipe.kcal, idx)}>
+                              <button className="text-sm underline text-brand-charcoal-light hover:text-brand-gold" onClick={() => swapRecipe(it.meal_type, it.recipe.kcal, idx)}>
                                   ↻ Remplacer
                               </button>
                           </div>
@@ -411,12 +397,12 @@ export default function Coach() {
 
       <Accordion title="Idées de Snacks Rapides">
           <div className="flex justify-end mb-2">
-              <button className="btn btn-subtle" onClick={loadSnacks} title="Rafraîchir">
+              <button className="btn btn-subtle !p-2" onClick={loadSnacks} title="Rafraîchir">
                   <IconArrowPath className="w-5 h-5"/>
               </button>
           </div>
           {snacks.length === 0 && (
-              <div className="text-brand-charcoal-light">Aucun snack trouvé pour vos critères.</div>
+              <div className="text-brand-charcoal-light text-center p-4">Aucun snack trouvé pour vos critères.</div>
           )}
           <div className="grid gap-3">
               {snacks.map(r => (
@@ -428,22 +414,9 @@ export default function Coach() {
       <AddRecipeForm />
     </div>
   );
-
-function Field({ label, type = "text", value, onChange, step }) {
-  return (
-    <div>
-      <label className="text-sm text-slate-600">{label}</label>
-      <input
-        className="mt-1 border rounded-xl px-3 py-2 w-full"
-        type={type}
-        step={step}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-      />
-    </div>
-  );
 }
 
+// Helper Components
 function Stat({ label, value, unit }) {
   return (
     <div className="bg-brand-sand/50 rounded-2xl p-4 text-center">
@@ -459,19 +432,19 @@ function Stat({ label, value, unit }) {
 function QuickScale({ label, value, onChange }) {
   return (
     <div>
-      <div className="text-sm text-slate-600 mb-1">{label} (1–5)</div>
-      <div className="flex gap-2">
+      <div className="text-sm font-medium text-brand-charcoal-light mb-2">{label} (1–5)</div>
+      <div className="flex flex-wrap gap-2">
         {[1, 2, 3, 4, 5].map(n => (
           <button
             key={n}
-            className={`btn ${value === n ? "btn-primary" : "bg-white shadow"}`}
+            className={`btn !py-2 !px-4 ${value === n ? "btn-secondary" : "btn-subtle"}`}
             onClick={() => onChange(n)}
             type="button"
           >
             {n}
           </button>
         ))}
-        <button className="btn bg-white shadow" onClick={() => onChange(null)} type="button">
+        <button className="btn btn-ghost !py-2 !px-4" onClick={() => onChange(null)} type="button">
           Effacer
         </button>
       </div>
