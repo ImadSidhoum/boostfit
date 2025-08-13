@@ -24,6 +24,8 @@ body{
 
 /* Container mobile : garde de la place pour le dock */
 .app-container{
+  /* NEW: leave room for the notch/status bar when in standalone on iOS */
+  padding-top: max(12px, env(safe-area-inset-top));
   padding-bottom: calc(env(safe-area-inset-bottom) + 96px);
   @apply max-w-3xl mx-auto p-4 sm:p-6;
 }
