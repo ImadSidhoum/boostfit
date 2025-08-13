@@ -15,10 +15,9 @@ ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 
 RUN npm run build
 
-# Serve via Nginx + proxy /api -> backend (configured by BACKEND_ORIGIN)
 FROM nginx:1.25-alpine
-# Use nginx template so envsubst can inject BACKEND_ORIGIN
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
+
