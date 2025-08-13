@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 export default function ProgressRing({ total = 3, done = 0, size = 84, stroke = 10 }) {
   const pct = total > 0 ? done / total : 0;
   const r = (size - stroke) / 2;
@@ -8,15 +10,15 @@ export default function ProgressRing({ total = 3, done = 0, size = 84, stroke = 
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-sm">
       <defs>
         <linearGradient id="gold_gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={_tw.theme.colors.brand.gold.light} />
-          <stop offset="100%" stopColor={_tw.theme.colors.brand.gold.DEFAULT} />
+            <stop offset="0%" stopColor="#E7D48D" />
+            <stop offset="100%" stopColor="#D4AF37" />
         </linearGradient>
       </defs>
       <circle
         cx={size / 2}
         cy={size / 2}
         r={r}
-        stroke={_tw.theme.colors.slate[200]}
+        className="stroke-slate-200"
         strokeWidth={stroke}
         fill="none"
       />
@@ -42,7 +44,7 @@ export default function ProgressRing({ total = 3, done = 0, size = 84, stroke = 
         className="font-bold text-xl text-brand-charcoal-dark"
         dy=".1em"
       >
-        {Math.round(pct * 100)}%
+        {`${Math.round(pct * 100)}%`}
       </text>
     </svg>
   );
