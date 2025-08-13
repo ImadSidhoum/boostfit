@@ -30,8 +30,8 @@ body{
 
 /* Already present; extend it with top padding */
 .app-container{
-  padding-bottom: calc(var(--sab) + 96px);
-  padding-top:  calc(var(--sat) + 12px);   /* 👈 keeps content below the notch */
+  padding-top: calc(env(safe-area-inset-top) + 12px);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 96px);
 }
 
 /* Cartes “verre” */
