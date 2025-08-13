@@ -1,24 +1,22 @@
-# motivation-app/render.yaml
-
+# render.yaml
 services:
-  # The Python/FastAPI backend service
+  # ---------- FastAPI backend ----------
   - type: web
     name: backend
     env: docker
+    plan: free
     rootDir: ./backend
-    healthCheck:
-      path: /health
-      port: 8000
-    envVarGroups:
-      - name: boostfit-secrets # Link to your secrets
-
-  # The React/Nginx frontend service
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: boostfit-secrets
+  # ---------- Nginx (Vite build) frontend ----------
   - type: web
     name: frontend
     env: docker
+    plan: free
     rootDir: ./frontend
+    autoDeploy: true
+    healthCheckPath: /
     envVars:
-      - key: VITE_API_URL # This is passed to the Docker build
-        value: /api
-    envVarGroups:
-      - name: boostfit-secrets # Also links to secrets for build args
+      - fromGroup: boostfit-secrets
