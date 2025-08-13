@@ -444,7 +444,8 @@ def pick_plan_for_today(db, user_id: UUID) -> Tuple[str, List[Habit]]:
             SELECT id, name, icon, category, difficulty
             FROM habits
             WHERE user_id=%s AND category='nutrition' AND difficulty <= %s
-            ORDER BY difficulty ASC, id ASC LIMIT 1
+            ORDER BY difficulty ASC, created_at DESC, id DESC
+            LIMIT 1
         """, (user_id, max_diff))
         nutrition = cur.fetchone()
 
@@ -452,7 +453,8 @@ def pick_plan_for_today(db, user_id: UUID) -> Tuple[str, List[Habit]]:
             SELECT id, name, icon, category, difficulty
             FROM habits
             WHERE user_id=%s AND category='movement' AND difficulty <= %s
-            ORDER BY difficulty ASC, id ASC LIMIT 1
+            ORDER BY difficulty ASC, created_at DESC, id DESC
+            LIMIT 1
         """, (user_id, max_diff))
         movement = cur.fetchone()
 
@@ -460,7 +462,8 @@ def pick_plan_for_today(db, user_id: UUID) -> Tuple[str, List[Habit]]:
             SELECT id, name, icon, category, difficulty
             FROM habits
             WHERE user_id=%s AND category IN ('hydration','lifestyle') AND difficulty <= %s
-            ORDER BY difficulty ASC, id ASC LIMIT 1
+            ORDER BY difficulty ASC, created_at DESC, id DESC
+            LIMIT 1
         """, (user_id, max_diff))
         hydra = cur.fetchone()
 
