@@ -1,4 +1,3 @@
-# frontend/nginx.conf.template
 server {
   listen 80;
   server_name _;
@@ -6,19 +5,19 @@ server {
   root /usr/share/nginx/html;
   index index.html;
 
-  # Proxy /api to the public backend origin (set via BACKEND_ORIGIN env)
+  # Proxy /api to your backend public URL
   location /api/ {
     proxy_pass ${BACKEND_ORIGIN}/api/;
-    proxy_set_header Host $${host};
-    proxy_set_header X-Real-IP $${remote_addr};
-    proxy_set_header X-Forwarded-For $${proxy_add_x_forwarded_for};
+    proxy_set_header Host $$host;
+    proxy_set_header X-Real-IP $$remote_addr;
+    proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
     proxy_http_version 1.1;
     proxy_set_header Connection "";
   }
 
   # SPA fallback
   location / {
-    try_files $${uri} $${uri}/ /index.html;
+    try_files $$uri $$uri/ /index.html;
   }
 
   gzip on;
