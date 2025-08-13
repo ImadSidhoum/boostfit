@@ -9,20 +9,16 @@ services:
     healthCheck:
       path: /health
       port: 8000
-    # Link to the secret group you will create in the Render dashboard
     envVarGroups:
-      - name: boostfit-secrets
+      - name: boostfit-secrets # Link to your secrets
 
   # The React/Nginx frontend service
   - type: web
     name: frontend
     env: docker
     rootDir: ./frontend
-    # These build arguments are passed to your frontend Dockerfile
-    dockerBuildArgs:
-      VITE_API_URL: /api
-      VITE_SUPABASE_URL: $VITE_SUPABASE_URL
-      VITE_SUPABASE_ANON_KEY: $VITE_SUPABASE_ANON_KEY
-    # Link to the same secret group to get the values for the build args
+    envVars:
+      - key: VITE_API_URL # This is passed to the Docker build
+        value: /api
     envVarGroups:
-      - name: boostfit-secrets
+      - name: boostfit-secrets # Also links to secrets for build args
