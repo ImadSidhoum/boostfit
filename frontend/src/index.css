@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ring: #F97316;
+}
+
+.app-container {
+  @apply max-w-3xl mx-auto p-4 sm:p-6;
+}
+
+.card {
+  @apply bg-white rounded-2xl shadow-md p-4 sm:p-6;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold transition;
+}
+
+.btn-primary {
+  @apply bg-brand-600 hover:bg-brand-500 text-white;
+}
+
+.badge {
+  @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-700;
+}
